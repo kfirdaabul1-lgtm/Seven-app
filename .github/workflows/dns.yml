@@ -10,7 +10,6 @@ jobs:
     steps:
       - run: |
           D=app.sevencollection.co.il
-          echo "::notice title=auth park1::$(dig +short $D CNAME @park1.livedns.co.il) | park2: $(dig +short $D CNAME @park2.livedns.co.il) | any: $(dig +short $D ANY @park1.livedns.co.il | tr '\n' ' ')"
-          echo "::notice title=google::$(dig +short $D CNAME @8.8.8.8) | cf: $(dig +short $D CNAME @1.1.1.1) | NS: $(dig +short NS sevencollection.co.il @8.8.8.8 | tr '\n' ' ')"
-          echo "::notice title=http::$(curl -sI --max-time 15 http://$D/ | head -3 | tr '\r\n' '  ')"
-# 1793876631
+          for s in park1.livedns.co.il 8.8.8.8 1.1.1.1; do echo "::notice title=dig $s::$(dig $D A @$s +noall +answer +comments | grep -v '^;; \(Got\|->>\|flags\|OPT\|QUESTION\|EDNS\)' | tr '\n' ' ' | head -c 380)"; done
+          echo "::notice title=App case::$(dig +short App.sevencollection.co.il CNAME @park1.livedns.co.il) / lower: $(dig +short app.sevencollection.co.il CNAME @park1.livedns.co.il)"
+          echo "::notice title=https::$(curl -sI --max-time 15 https://$D/ 2>&1 | head -2 | tr '\r\n' '  ') err=$(curl -s -o /dev/null --max-time 15 https://$D/ 2>&1; echo $?)"
