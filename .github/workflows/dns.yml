@@ -1,16 +1,14 @@
-name: DNS check
+name: HTTPS check
 on:
   push:
     branches: [main]
     paths: ['.github/workflows/dns.yml']
   workflow_dispatch:
 jobs:
-  dig:
+  check:
     runs-on: ubuntu-latest
     steps:
       - run: |
           D=app.sevencollection.co.il
-          for s in park1.livedns.co.il 8.8.8.8 1.1.1.1; do echo "::notice title=dig $s::$(dig $D A @$s +noall +answer +comments | grep -v '^;; \(Got\|->>\|flags\|OPT\|QUESTION\|EDNS\)' | tr '\n' ' ' | head -c 380)"; done
-          echo "::notice title=SOA::$(dig +short SOA sevencollection.co.il @park1.livedns.co.il) | google noerror: $(dig app.sevencollection.co.il CNAME @8.8.8.8 +noall +authority | tr '\n' ' ')"
-          echo "::notice title=App case::$(dig +short App.sevencollection.co.il CNAME @park1.livedns.co.il) / lower: $(dig +short app.sevencollection.co.il CNAME @park1.livedns.co.il)"
-          echo "::notice title=https::$(curl -sI --max-time 15 https://$D/ 2>&1 | head -2 | tr '\r\n' '  ') err=$(curl -s -o /dev/null --max-time 15 https://$D/ 2>&1; echo $?)"
+          for i in $(seq 1 50); do if curl -s -o /dev/null --max-time 15 https://$D/; then echo "::notice title=HTTPS OK::after $i tries $(date -u +%H:%M) · $(curl -sI https://$D/ | head -1)"; exit 0; fi; sleep 30; done
+          echo "::notice title=HTTPS not yet::$(date -u +%H:%M)"
