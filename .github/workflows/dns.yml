@@ -9,6 +9,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          D=app.sevencollection.co.il
-          echo "::notice title=config::$(curl -s https://$D/config.js | grep -o 'appUrl: "[^"]*"\|domain: "[^"]*"' | tr '\n' ' ')"
-          echo "::notice title=pages::index $(curl -s -o /dev/null -w '%{http_code}' https://$D/) events $(curl -s -o /dev/null -w '%{http_code}' https://$D/events.html) spa $(curl -s -o /dev/null -w '%{http_code}' https://$D/spa.html) sw $(curl -s -o /dev/null -w '%{http_code}' https://$D/firebase-messaging-sw.js)"
+          for u in https://app.sevencollection.co.il/index.html https://kfirdaabul1-lgtm.github.io/shifts/index.html; do echo "::notice title=$u::pwInfoHTML=$(curl -s $u | grep -c 'function pwInfoHTML') age=$(curl -sI $u | grep -i '^age\|^last-modified' | tr '\r\n' '  ')"; done
