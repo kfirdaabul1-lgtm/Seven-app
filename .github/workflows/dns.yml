@@ -10,5 +10,5 @@ jobs:
     steps:
       - run: |
           D=app.sevencollection.co.il
-          for i in $(seq 1 50); do if curl -s -o /dev/null --max-time 15 https://$D/; then echo "::notice title=HTTPS OK::after $i tries $(date -u +%H:%M) · $(curl -sI https://$D/ | head -1)"; exit 0; fi; sleep 30; done
-          echo "::notice title=HTTPS not yet::$(date -u +%H:%M)"
+          echo "::notice title=config::$(curl -s https://$D/config.js | grep -o 'appUrl: "[^"]*"\|domain: "[^"]*"' | tr '\n' ' ')"
+          echo "::notice title=pages::index $(curl -s -o /dev/null -w '%{http_code}' https://$D/) events $(curl -s -o /dev/null -w '%{http_code}' https://$D/events.html) spa $(curl -s -o /dev/null -w '%{http_code}' https://$D/spa.html) sw $(curl -s -o /dev/null -w '%{http_code}' https://$D/firebase-messaging-sw.js)"
